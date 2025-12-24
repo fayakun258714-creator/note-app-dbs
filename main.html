@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Main</title>
+
+    <!-- font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.hugeicons.com/font/hgi-stroke-rounded.css"
+    />
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Plus Jakarta Sans", sans-serif;
+        background-color: #fafafa;
+        padding: 24px;
+        max-width: 420px;
+        margin: 0 auto;
+      }
+
+      .header {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 32px;
+      }
+
+      .logo {
+        font-size: 24pt;
+        padding: 10px;
+        transition: 0.2s;
+        border-radius: 10px;
+      }
+
+      .logo:hover {
+        background: grey;
+      }
+
+      .logo2 {
+        font-size: 18pt;
+        color: #19c3e6;
+        opacity: 0.7;
+      }
+
+      .label {
+        font-size: 11px;
+        color: #999;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 4px;
+      }
+
+      .greeting {
+        font-size: 22px;
+        font-weight: 600;
+        color: #000;
+      }
+
+      .create-box {
+        background: white;
+        border-radius: 16px;
+        padding: 24px;
+        margin-bottom: 32px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      }
+
+      .section-title {
+        font-size: 12pt;
+        font-weight: bold;
+        color: #000;
+        margin-bottom: 16px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+      }
+
+      .sub-sub-title {
+        margin-left: 8px;
+        font-size: 12pt;
+        font-weight: bold;
+        color: #000;
+      }
+
+      input,
+      textarea {
+        width: 100%;
+        padding: 12px;
+        border: 1.5px solid #e5e5e5;
+        border-radius: 10px;
+        font-size: 14px;
+        font-family: inherit;
+        margin-bottom: 12px;
+        transition: all 0.2s;
+      }
+
+      input:focus,
+      textarea:focus {
+        outline: none;
+        border-color: #19c3e6;
+      }
+
+      textarea {
+        resize: none;
+        height: 80px;
+      }
+
+      .btn-add {
+        width: 100%;
+        padding: 13px;
+        background: #19c3e6;
+        color: black;
+        border: none;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+
+      .btn-add:hover {
+        background: grey;
+      }
+
+      .notes-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #000;
+        margin-bottom: 16px;
+      }
+
+      .note {
+        background: white;
+        border-radius: 12px;
+        padding: 18px;
+        margin-bottom: 12px;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+      }
+
+      .note-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 8px;
+      }
+
+      .note-title {
+        font-size: 15px;
+        font-weight: 600;
+        color: #000;
+        margin-bottom: 2px;
+      }
+
+      .note-date {
+        font-size: 12px;
+        color: #19c3e6;
+        opacity: 0.7;
+      }
+
+      .note-actions {
+        display: flex;
+        gap: 4px;
+      }
+
+      .icon-btn {
+        width: 32px;
+        height: 32px;
+        background: transparent;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s;
+      }
+
+      .icon-btn:hover {
+        background: #f5f5f5;
+      }
+
+      .note-text {
+        font-size: 14px;
+        color: #666;
+        line-height: 1.5;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <div>
+        <div class="label">DASHBOARD</div>
+        <div class="greeting">Hi, student@uni.edu</div>
+      </div>
+      <div>
+        <i onclick="logout()" class="hgi hgi-stroke hgi-logout-05 logo"></i>
+      </div>
+    </div>
+
+    <div class="create-box">
+      <div class="section-title">
+        <i class="hgi hgi-stroke hgi-property-edit logo2"></i>
+        <span class="sub-sub-title">Create new note</span>
+      </div>
+      <input type="text" id="judul" placeholder="Note Title" />
+      <textarea id="isi" placeholder="Write your thoughts here..."></textarea>
+      <button class="btn-add" onclick="add()">+ Add Note</button>
+    </div>
+
+    <div class="notes-title">Your notes</div>
+
+    <div class="wadah" id="wadah">
+      <!-- <div class="note">
+        <div class="note-top">
+            <div>
+                <div class="note-title">React Hooks Study</div>
+                <div class="note-date">Oct 24, 2025</div>
+            </div>
+            <div class="note-actions">
+                <button class="icon-btn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2">
+                        <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>
+                    </svg>
+                </button>
+                <button class="icon-btn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2">
+                        <path d="M3 6h18M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <div class="note-text">Remember to review useEffect dependencies array. Ideally, include all variables used inside the effect</div>
+    </div>
+
+    <div class="note">
+        <div class="note-top">
+            <div>
+                <div class="note-title">JavaScript Tips</div>
+                <div class="note-date">Oct 23, 2025</div>
+            </div>
+            <div class="note-actions">
+                <button class="icon-btn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2">
+                        <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>
+                    </svg>
+                </button>
+                <button class="icon-btn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2">
+                        <path d="M3 6h18M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <div class="note-text">Use const for variables that won't be reassigned, let for variables that will change</div>
+    </div> -->
+    </div>
+
+    <script>
+      let notes = [];
+
+      let daftarCatatan = [];
+
+      function add() {
+        let judul = document.getElementById("judul")
+        let isi = document.getElementById("isi")
+        let tanggal = new Date();
+
+        let options = { year: "numeric", month: "short", day: "numeric" };
+        let tanggalFormatted = tanggal.toLocaleDateString("id-ID", options);
+
+        let catatanBaru = {
+          title: judul.value,
+          date: tanggalFormatted,
+          content: isi.value,
+        };
+        
+        if (!judul.value && !isi.value) return alert("Judul & Isi harus terisi!")
+        if (!judul.value) return alert("Judul harus terisi!")
+        if (!isi.value) return alert("Isi harus terisi!")
+        
+        daftarCatatan.push(catatanBaru);
+        tampilkanCatatan();
+        isi.value = ''
+        judul.value = ''
+      }
+
+      function tampilkanCatatan() {
+        // membaca dari daftar note
+        let wadah = document.getElementById("wadah");
+        
+        wadah.innerHTML = ''
+
+        for (let i = 0; i < daftarCatatan.length; i++) {
+          wadah.innerHTML += `<div class="note">
+        <div class="note-top">
+            <div>
+                <div class="note-title">${daftarCatatan[i].title}</div>
+                <div class="note-date">${daftarCatatan[i].date}</div>
+            </div>
+            <div class="note-actions">
+                <button class="icon-btn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2">
+                        <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>
+                    </svg>
+                </button>
+                <button onclick="hapusCatatan()" class="icon-btn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2">
+                        <path d="M3 6h18M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <div class="note-text">${daftarCatatan[i].content}</div>
+    </div>`;
+        }
+      }
+      
+      function logout () {
+        window.location.href = './index.html';
+      }
+
+      function hapusCatatan (target) {
+        daftarCatatan.splice(target, 1)
+        tampilkanCatatan()
+        alert ("Berhasil di hapus!")
+      }
+
+    </script>
+  </body>
+</html>
