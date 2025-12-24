@@ -20,7 +20,6 @@
 
     .container {
       width: 390px;
-      /* background-color: antiquewhite; */
       margin-top: 80px;
       margin-left: auto;
       margin-right: auto;
@@ -134,11 +133,25 @@
       let inEmail = document.getElementById('email');
       let inPassword = document.getElementById('password');
 
-      console.log(inEmail.value);
-      console.log(inPassword.value);
-      let userDb = getFromStorage()
+      if (!inEmail.value || !inPassword.value) {
+        alert('Please fill in all fields');
+        return;
+      }
+
+      let userDb = getFromStorage();
+      
+      if (!userDb) {
+        alert('No account found. Please register first.');
+        return;
+      }
   
       if (inEmail.value === userDb.email && inPassword.value === userDb.password) {
+        // Simpan session user yang sedang login
+        localStorage.setItem('currentUser', JSON.stringify({
+          email: userDb.email,
+          loginTime: new Date().toISOString()
+        }));
+        
         alert('Login Successful');
         window.location.href = './main.html';
       } else {
@@ -146,10 +159,9 @@
       }
     }
 
-
     function getFromStorage() {
       let userInStorage = localStorage.getItem('user');
-      return JSON.parse(userInStorage);
+      return userInStorage ? JSON.parse(userInStorage) : null;
     }
   </script>
 

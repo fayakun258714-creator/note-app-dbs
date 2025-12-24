@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap"
       rel="stylesheet"
     />
 
@@ -47,10 +47,11 @@
         padding: 10px;
         transition: 0.2s;
         border-radius: 10px;
+        cursor: pointer;
       }
 
       .logo:hover {
-        background: grey;
+        background: #e5e5e5;
       }
 
       .logo2 {
@@ -135,7 +136,7 @@
       }
 
       .btn-add:hover {
-        background: grey;
+        background: #17a9c0;
       }
 
       .notes-title {
@@ -200,13 +201,25 @@
         color: #666;
         line-height: 1.5;
       }
+
+      .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: #999;
+      }
+
+      .empty-state i {
+        font-size: 48px;
+        margin-bottom: 16px;
+        opacity: 0.3;
+      }
     </style>
   </head>
   <body>
     <div class="header">
       <div>
         <div class="label">DASHBOARD</div>
-        <div class="greeting">Hi, student@uni.edu</div>
+        <div class="greeting" id="user-greeting">Hi, User</div>
       </div>
       <div>
         <i onclick="logout()" class="hgi hgi-stroke hgi-logout-05 logo"></i>
@@ -216,131 +229,214 @@
     <div class="create-box">
       <div class="section-title">
         <i class="hgi hgi-stroke hgi-property-edit logo2"></i>
-        <span class="sub-sub-title">Create new note</span>
+        <span id="span-create" class="sub-sub-title">Create new note</span>
       </div>
       <input type="text" id="judul" placeholder="Note Title" />
       <textarea id="isi" placeholder="Write your thoughts here..."></textarea>
-      <button class="btn-add" onclick="add()">+ Add Note</button>
+      <button class="btn-add" id="btn-add" onclick="handleSubmit()">+ Add Note</button>
     </div>
 
     <div class="notes-title">Your notes</div>
 
     <div class="wadah" id="wadah">
-      <!-- <div class="note">
-        <div class="note-top">
-            <div>
-                <div class="note-title">React Hooks Study</div>
-                <div class="note-date">Oct 24, 2025</div>
-            </div>
-            <div class="note-actions">
-                <button class="icon-btn">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2">
-                        <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>
-                    </svg>
-                </button>
-                <button class="icon-btn">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2">
-                        <path d="M3 6h18M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
-                    </svg>
-                </button>
-            </div>
-        </div>
-        <div class="note-text">Remember to review useEffect dependencies array. Ideally, include all variables used inside the effect</div>
+      <div class="empty-state">
+        <i class="hgi hgi-stroke hgi-note"></i>
+        <p>No notes yet. Create your first note above!</p>
+      </div>
     </div>
 
-    <div class="note">
-        <div class="note-top">
-            <div>
-                <div class="note-title">JavaScript Tips</div>
-                <div class="note-date">Oct 23, 2025</div>
-            </div>
-            <div class="note-actions">
-                <button class="icon-btn">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2">
-                        <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>
-                    </svg>
-                </button>
-                <button class="icon-btn">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2">
-                        <path d="M3 6h18M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
-                    </svg>
-                </button>
-            </div>
-        </div>
-        <div class="note-text">Use const for variables that won't be reassigned, let for variables that will change</div>
-    </div> -->
-    </div>
-
-    <script>
-      let notes = [];
-
+    <script type="text/JavaScript">
+      let onEdit = null;
+      let editing = false;
       let daftarCatatan = [];
+      
+      // INIT - Load user data saat halaman dibuka
+      window.onload = function() {
+        loadUserData();
+        loadNotes();
+      };
 
+      // Load data user untuk greeting
+      function loadUserData() {
+        let currentUser = localStorage.getItem('currentUser');
+        if (!currentUser) {
+          alert('Session expired. Please login again.');
+          window.location.href = './index.html';
+          return;
+        }
+
+        let user = JSON.parse(currentUser);
+        let greetingEl = document.getElementById('user-greeting');
+        greetingEl.textContent = 'Hi, ' + user.email;
+      }
+
+      // Load notes milik user yang login
+      function loadNotes() {
+        let currentUser = localStorage.getItem('currentUser');
+        if (!currentUser) return;
+
+        let user = JSON.parse(currentUser);
+        let notesKey = 'notes_' + user.email;
+        let savedNotes = localStorage.getItem(notesKey);
+
+        if (savedNotes) {
+          daftarCatatan = JSON.parse(savedNotes);
+          tampilkanCatatan();
+        }
+      }
+
+      // Simpan notes ke localStorage
+      function saveNotes() {
+        let currentUser = localStorage.getItem('currentUser');
+        if (!currentUser) return;
+
+        let user = JSON.parse(currentUser);
+        let notesKey = 'notes_' + user.email;
+        localStorage.setItem(notesKey, JSON.stringify(daftarCatatan));
+      }
+      
+      function handleSubmit() {
+        if (editing) {
+          saveEdit();
+        } else {
+          add();
+        }
+      }
+      
       function add() {
-        let judul = document.getElementById("judul")
-        let isi = document.getElementById("isi")
+        let judul = document.getElementById("judul");
+        let isi = document.getElementById("isi");
         let tanggal = new Date();
-
+        
         let options = { year: "numeric", month: "short", day: "numeric" };
         let tanggalFormatted = tanggal.toLocaleDateString("id-ID", options);
-
+        
+        if (!judul.value && !isi.value) return alert("Judul & Isi harus terisi!");
+        if (!judul.value) return alert("Judul harus terisi!");
+        if (!isi.value) return alert("Isi harus terisi!");
+        
         let catatanBaru = {
           title: judul.value,
           date: tanggalFormatted,
           content: isi.value,
         };
         
-        if (!judul.value && !isi.value) return alert("Judul & Isi harus terisi!")
-        if (!judul.value) return alert("Judul harus terisi!")
-        if (!isi.value) return alert("Isi harus terisi!")
-        
         daftarCatatan.push(catatanBaru);
+        saveNotes(); // Simpan ke localStorage
         tampilkanCatatan();
-        isi.value = ''
-        judul.value = ''
+        isi.value = '';
+        judul.value = '';
       }
-
+      
       function tampilkanCatatan() {
-        // membaca dari daftar note
         let wadah = document.getElementById("wadah");
-        
-        wadah.innerHTML = ''
+        wadah.innerHTML = '';
 
+        // Tampilkan empty state jika tidak ada notes
+        if (daftarCatatan.length === 0) {
+          wadah.innerHTML = `
+            <div class="empty-state">
+              <i class="hgi hgi-stroke hgi-note"></i>
+              <p>No notes yet. Create your first note above!</p>
+            </div>
+          `;
+          return;
+        }
+        
         for (let i = 0; i < daftarCatatan.length; i++) {
           wadah.innerHTML += `<div class="note">
-        <div class="note-top">
-            <div>
+            <div class="note-top">
+              <div>
                 <div class="note-title">${daftarCatatan[i].title}</div>
                 <div class="note-date">${daftarCatatan[i].date}</div>
-            </div>
-            <div class="note-actions">
-                <button class="icon-btn">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2">
-                        <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>
-                    </svg>
+              </div>
+              <div class="note-actions">
+                <button onclick="editText(${i})" class="icon-btn">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2">
+                    <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>
+                  </svg>
                 </button>
-                <button onclick="hapusCatatan()" class="icon-btn">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2">
-                        <path d="M3 6h18M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
-                    </svg>
+                <button onclick="hapusCatatan(${i})" class="icon-btn">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2">
+                    <path d="M3 6h18M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+                  </svg>
                 </button>
+              </div>
             </div>
-        </div>
-        <div class="note-text">${daftarCatatan[i].content}</div>
-    </div>`;
+            <div class="note-text">${daftarCatatan[i].content}</div>
+          </div>`;
         }
       }
       
-      function logout () {
-        window.location.href = './index.html';
+      function logout() {
+        if (confirm("Yakin ingin logout?")) {
+          localStorage.removeItem('currentUser');
+          alert("Berhasil Logout!");
+          window.location.href = './index.html';
+        }
       }
 
-      function hapusCatatan (target) {
-        daftarCatatan.splice(target, 1)
-        tampilkanCatatan()
-        alert ("Berhasil di hapus!")
+      function hapusCatatan(target) {
+        if (confirm("Yakin ingin menghapus catatan ini?")) {
+          daftarCatatan.splice(target, 1);
+          saveNotes(); // Simpan perubahan
+          tampilkanCatatan();
+          alert("Berhasil dihapus!");
+        }
       }
+      
+      function editText(index) {
+        editing = true;
+        onEdit = index;
+        
+        let btnAddNote = document.getElementById("btn-add");
+        let spanCreate = document.getElementById("span-create");
+        let judul = document.getElementById("judul");
+        let isi = document.getElementById("isi");
 
+        judul.value = daftarCatatan[index].title;
+        isi.value = daftarCatatan[index].content;
+
+        btnAddNote.innerText = 'Save Changes';
+        spanCreate.innerText = 'Edit note';
+        
+        // Scroll ke atas untuk melihat form
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+      
+      function saveEdit() {
+        let judul = document.getElementById("judul");
+        let isi = document.getElementById("isi");
+        
+        if (!judul.value && !isi.value) return alert("Judul & Isi harus terisi!");
+        if (!judul.value) return alert("Judul harus terisi!");
+        if (!isi.value) return alert("Isi harus terisi!");
+        
+        // Update catatan yang sedang diedit
+        daftarCatatan[onEdit].title = judul.value;
+        daftarCatatan[onEdit].content = isi.value;
+        
+        // Reset form
+        saveNotes(); // Simpan perubahan
+        resetForm();
+        tampilkanCatatan();
+        alert("Catatan berhasil diupdate!");
+      }
+      
+      function resetForm() {
+        editing = false;
+        onEdit = null;
+        
+        let btnAddNote = document.getElementById("btn-add");
+        let spanCreate = document.getElementById("span-create");
+        let judul = document.getElementById("judul");
+        let isi = document.getElementById("isi");
+        
+        judul.value = '';
+        isi.value = '';
+        btnAddNote.innerText = '+ Add Note';
+        spanCreate.innerText = 'Create new note';
+      }
     </script>
   </body>
 </html>

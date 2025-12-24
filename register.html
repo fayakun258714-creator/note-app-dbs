@@ -146,6 +146,10 @@
       let inCfPassword = document.getElementById("input-confirm-password")
       // melihat value
       console.log(inEmail.value);
+      if (!inEmail.value || !inPassword.value || !inCfPassword.value) {
+        alert("Semua field harus diisi!");
+        return;
+      }
       if (inPassword.value !== inCfPassword.value) {
         alert("Password dan Confirm Password harus sama!");
         return;
@@ -168,6 +172,11 @@
       let stringDataUser = JSON.stringify(dataUser);
       localStorage.setItem('user', stringDataUser);
     }
+
+    localStorage.setItem('currentUser', JSON.stringify({
+    email: userDb.email,
+    loginTime: new Date().toISOString()
+    }));
   </script>
 
 </body>
